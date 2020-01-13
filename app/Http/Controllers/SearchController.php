@@ -57,6 +57,7 @@ class SearchController extends Controller
             $total = $avgFlight + $avgHotel + $priceMeal + $priceTicket;
             $days = $request->days;
             $persons = $request->persons;
+            $scroll = true;
 
             return view('index')
             ->with(compact('avgFlight'))
@@ -65,7 +66,8 @@ class SearchController extends Controller
             ->with(compact('priceTicket'))
             ->with(compact('days'))
             ->with(compact('persons'))
-            ->with(compact('total'));
+            ->with(compact('total'))
+            ->with(compact('scroll'));
       }
 
 

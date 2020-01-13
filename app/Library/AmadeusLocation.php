@@ -4,7 +4,7 @@ namespace App\Library;
 
 use Ixudra\Curl\Facades\Curl;
 use App\Library\AmadeusConnection;
-
+use App\Helpers\HandlingHelper as Handling;
 
 /**
  * Amadeus API Connection and extract data
@@ -52,7 +52,7 @@ class AmadeusLocation extends AmadeusConnection {
         ->withHeader('Accept-Encoding: gzip')
         ->get();
 
-        $result =  $this->unzipJson($response);
+        $result =  Handling::unzipJson($response);
 
         $this->cities = $result->data;
 

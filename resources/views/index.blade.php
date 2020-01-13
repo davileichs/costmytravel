@@ -43,7 +43,8 @@
 
 
 <!-- Services -->
-<section class="pt-5 pb-5 bg-primary text-white" id="services">
+@if(isset($persons))
+<section class="pt-5 pb-5 bg-primary text-white" id="costs">
   <div class="container">
     <div class="content-section-heading text-center">
       <h2 class="text-secondary mb-2">Costs</h2>
@@ -106,7 +107,7 @@
     </div>
   </div>
 </section>
-
+@endif
 
 @endsection
 
@@ -120,9 +121,14 @@ $(document).ready(function(){
     resolverSettings: {
         url: "{{ env('APP_URL') }}/api/v1/cities/",
         dataType: 'json',
-
     }
-});
+  });
+
+  @if(isset($scroll))
+       $('html, body').animate({
+           scrollTop: $('#costs').offset().top
+       }, 'slow');
+   @endif
 
 
 });
