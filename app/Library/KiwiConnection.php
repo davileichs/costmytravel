@@ -19,12 +19,12 @@ class KiwiConnection {
      */
     private $endpoint = 'https://api.skypicker.com/flights';
     /**
-     * @var array Hotels result
+     * @var array Flights result
      */
     private $flights = [];
 
     /**
-     * @var string Hotel Endpoint
+     * @var string Flight standard search attributes
      */
      protected $search = [
        'curr'        => 'EUR',
@@ -41,7 +41,7 @@ class KiwiConnection {
      ];
 
      /**
-      * Connect API and save Token Authorization
+      * Get List of Flights
       *
       */
     public function searchFlights( array $search ) {
@@ -78,7 +78,7 @@ class KiwiConnection {
 
 
     /**
-     * Get Average price of Hotels
+     * Get Average price of Flights
      *
      * @return Double price
      */

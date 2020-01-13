@@ -15,17 +15,17 @@ class AmadeusLocation extends AmadeusConnection {
 
 
     /**
-     * @var string Hotel Endpoint
+     * @var string Location Endpoint
      */
     protected $endpoint = 'v1/reference-data/locations';
 
     /**
-     * @var array Hotels result
+     * @var array cities result
      */
     private $cities = [];
 
     /**
-     * @var array Location standard attributes
+     * @var array Location standard search attributes
      */
     protected $search = [
       'subType'     => 'CITY',

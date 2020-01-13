@@ -25,12 +25,12 @@ class NumbeoConnection {
     private $result;
 
     /**
-     * @var string result crawler
+     * @var string price
      */
     private $priceMeal;
 
     /**
-     * @var string result crawler
+     * @var string price
      */
     private $priceTicket;
 
@@ -78,7 +78,7 @@ class NumbeoConnection {
 
 
     /**
-     * Get string text
+     * Save prices from String
      *
      * @return double price
      */

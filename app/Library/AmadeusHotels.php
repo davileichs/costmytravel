@@ -26,7 +26,7 @@ class AmadeusHotels extends AmadeusConnection {
     private $hotels = [];
 
     /**
-     * @var array Hotel standard attributes
+     * @var array Hotel standard search attributes
      */
     protected $search = [
        'currency'        => 'EUR',
