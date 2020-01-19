@@ -4,7 +4,7 @@ namespace App\Library;
 
 use Ixudra\Curl\Facades\Curl;
 use App\Helpers\HandlingHelper as Handling;
-
+use Carbon\Carbon;
 
 /**
  * Kiwi API Connection and extract data
@@ -60,7 +60,76 @@ class KiwiConnection {
     }
 
 
+    /**
+     * Get format data returned from Kiwi
+     *
+     * @param Array $search
+     *
+     * @return Array
+     */
+    public function getRoutes() {
 
+        $routes = $this->flights;
+
+        $routeList = array();
+
+        foreach($routes as $route) {
+
+            $data = [
+              'price'       => $route->price,
+              'flightFrom'  => $route->cityFrom,
+              'flightTo'  => $route->cityTo,
+              'transfer'    => $this->getDataRoutes($route->route),
+              'duration'    => $route->fly_duration,
+              'url'         => $route->deep_link,
+            ];
+
+            array_push($routeList, $data);
+        }
+
+        return json_decode(json_encode($routeList), FALSE);
+    }
+
+
+
+    /**
+     * Get Text format from routes
+     *
+     * @param Array $search
+     *
+     * @return Array
+     */
+     protected function getDataRoutes($route) {
+
+        $dataRoutes = array();
+
+        foreach($route as $direction) {
+            $data = [
+              'from'  => $direction->cityFrom,
+              'to'  => $direction->cityTo,
+              'departure'  => Carbon::createFromTimestamp($direction->dTime)->format('H:i'),
+              'arrival'  => Carbon::createFromTimestamp($direction->aTime)->format('H:i'),
+            ];
+
+            array_push($dataRoutes, $data);
+        }
+
+        return $dataRoutes;
+
+     }
+
+
+    /**
+     * Get raw data returned from Kiwi
+     *
+     * @param Array $search
+     *
+     * @return Array
+     */
+    public function getData() {
+
+        return $this->flights;
+    }
 
     /**
      * Define standard search variables and set with new ones

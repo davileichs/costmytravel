@@ -17,4 +17,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('v1/search', 'Api\v1\SearchController@simpleSearch')->name('search.simple');
+
 Route::get('v1/cities', 'Api\v1\SearchController@searchLocation')->name('search.location');

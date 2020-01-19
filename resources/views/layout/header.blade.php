@@ -16,8 +16,8 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
 
   <!-- Custom CSS -->
-  <link href="css/stylish-portfolio.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset("/css/stylish-portfolio.min.css") }}" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset("/css/davistyles.css") }}" rel="stylesheet">
 
   @stack('styles')
 

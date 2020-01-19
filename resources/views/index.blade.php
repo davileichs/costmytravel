@@ -7,7 +7,7 @@
   <div class="container text-center my-auto">
     <h1 class="mb-1">Cost my Travel</h1>
 
-    <form method="post" action="{{ route('search') }}" class="mt-5 d-flex row rounded bg-dark p-3 text-light">
+    <form id="simpleSearch" class="mt-5 d-flex row rounded bg-dark p-3 text-light">
         @csrf
           <div class="form-group text-left input-group-lg col-12 col-md-6">
               <label for="from">From:</label>
@@ -37,77 +37,35 @@
               <label>&nbsp;</label>
               <button type="submit" class="form-control btn btn-primary btn-md">Go</button>
           </div>
+          <div class="invalid-feedback">
+              Invalid parameters
+          </div>
     </form>
   </div>
 </header>
 
 
-<!-- Services -->
-@if(isset($persons))
-<section class="pt-5 pb-5 bg-primary text-white" id="costs">
-  <div class="container">
-    <div class="content-section-heading text-center">
-      <h2 class="text-secondary mb-2">Costs</h2>
-    </div>
-
-    <div class="row">
-        <div class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
-            <div class="content-section-body">
-                  <p>Cost for {{ $persons }} persons</p>
-            </div>
-            <ul class="list-group list-group-flush">
-                @if(isset($avgFlight))
-                <li class="list-group-item bg-primary">
-                    <div class="row">
-                        <div class="col-6">Flight</div>
-                        <div class="col-3 text-right">{{ $persons }} tickets</div>
-                        <div class="col-3 text-right">${{ $avgFlight }}</div>
-                    </div>
-                </li>
-                @endif
-                @if(isset($avgHotel))
-                <li class="list-group-item bg-primary">
-                    <div class="row">
-                        <div class="col-6">Hotel</div>
-                        <div class="col-3 text-right">{{ $days }} days</div>
-                        <div class="col-3 text-right">${{ $avgHotel }}</div>
-                    </div>
-                </li>
-                @endif
-                @if(isset($priceMeal))
-                <li class="list-group-item bg-primary">
-                    <div class="row">
-                        <div class="col-6">Meal</div>
-                        <div class="col-3 text-right">{{ $days }} days</div>
-                        <div class="col-3 text-right">${{ $priceMeal }}</div>
-                    </div>
-                </li>
-                @endif
-                @if(isset($priceTicket))
-                <li class="list-group-item bg-primary">
-                    <div class="row">
-                        <div class="col-6">Public Transport</div>
-                        <div class="col-3 text-right">{{ $days }} days</div>
-                        <div class="col-3 text-right">${{ $priceTicket }}</div>
-                    </div>
-                </li>
-                @endif
-                @if(isset($total))
-                <li class="list-group-item list-group-item-light">
-                    <div class="row">
-                        <div class="col-9">Total</div>
-                        <div class="col-3 text-right font-weight-bold">$ {{ $total }}</div>
-                    </div>
-                </li>
-                @endif
-            </ul>
-        </div>
-    </div>
-
-    </div>
+<!-- Result -->
+<section class="pt-5 pb-5 bg-primary text-white d-none" id="costs">
+  <div class=" text-center loading-icon">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
   </div>
+  <div class="error"></div>
+
+  <div class="container d-none">
+
+    <div id="show-simple-search"> </div>
+
+    <div  id="show-flights" class="pt-5 pb-5"></div>
+
+  </div>
+
+
+
 </section>
-@endif
+
 
 @endsection
 
@@ -116,21 +74,59 @@
 
 $(document).ready(function(){
 
+   $(document).on('submit', '#simpleSearch', function(e){
+     e.preventDefault();
+
+
+     $('#costs').removeClass('d-none');
+     $('html, body').animate({
+         scrollTop: $('#costs').offset().top
+     }, 'slow');
+
+     $.ajax({
+         url: "{{ env('APP_URL') }}api/v1/search",
+         type: 'POST',
+         data: $(this).serialize(),
+         dataType: 'json'
+       }).done(function(data) {
+
+           $('#show-simple-search').append(data.view);
+
+           $('#show-flights').append(data.flight.view);
+
+           $('#costs .container').removeClass('d-none');
+           $('.loading-icon').hide();
+
+            $('.persons').text(data.persons);
+            $('.days').text(data.days);
+
+            $('.avgHotel').text(data.avgHotel);
+            $('.priceTicket').text(data.priceTicket);
+            $('.priceMeal').text(data.priceMeal);
+            $('.total').text(data.total);
+
+         }).fail(function(error){
+
+            $('.error').text(error.responseJSON.error);
+            $('.loading-icon').hide();
+            $('.error').show();
+         });
+
+   });
 
   $('#to, #from').autoComplete({
     resolverSettings: {
-        url: "{{ env('APP_URL') }}/api/v1/cities/",
+        url: "{{ env('APP_URL') }}api/v1/cities/",
         dataType: 'json',
     }
   });
 
-  @if(isset($scroll))
-       $('html, body').animate({
-           scrollTop: $('#costs').offset().top
-       }, 'slow');
-   @endif
-
-
 });
+
+function drawFlight(flight) {
+
+
+
+}
 </script>
 @endpush

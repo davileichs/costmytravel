@@ -15,6 +15,4 @@ Route::get('/', function(){
   return view('welcome');
 })->name('cv');
 
-Route::get('/costmytravel', 'SearchController@index')->name('index');
-
-Route::post('/costmytravel', 'SearchController@search')->name('search');
+Route::get('/costmytravel', 'HomeController@index')->name('index');
