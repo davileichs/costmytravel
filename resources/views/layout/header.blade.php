@@ -17,7 +17,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ asset("/css/stylish-portfolio.min.css") }}" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset("/css/davistyles.css") }}" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset("/css/costmytravelstyles.css") }}" rel="stylesheet">
 
   @stack('styles')
 
