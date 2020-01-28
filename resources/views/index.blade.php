@@ -56,9 +56,11 @@
 
   <div class="container d-none">
 
-    <div id="show-simple-search"> </div>
+    <div id="show-simple-search"></div>
 
     <div  id="show-flights" class="pt-5 pb-5"></div>
+
+    <div  id="show-hotels" class="pt-5 pb-5"></div>
 
   </div>
 
@@ -77,6 +79,12 @@ $(document).ready(function(){
    $(document).on('submit', '#simpleSearch', function(e){
      e.preventDefault();
 
+     $('#show-simple-search').html('');
+     $('#show-flights').html('');
+     $('#show-hotels').html('');
+
+     $('.loading-icon').show();
+
 
      $('#costs').removeClass('d-none');
      $('html, body').animate({
@@ -94,16 +102,12 @@ $(document).ready(function(){
 
            $('#show-flights').append(data.flight.view);
 
+           $('#show-hotels').append(data.hotel.view);
+
            $('#costs .container').removeClass('d-none');
+
            $('.loading-icon').hide();
 
-            $('.persons').text(data.persons);
-            $('.days').text(data.days);
-
-            $('.avgHotel').text(data.avgHotel);
-            $('.priceTicket').text(data.priceTicket);
-            $('.priceMeal').text(data.priceMeal);
-            $('.total').text(data.total);
 
          }).fail(function(error){
 
@@ -123,10 +127,5 @@ $(document).ready(function(){
 
 });
 
-function drawFlight(flight) {
-
-
-
-}
 </script>
 @endpush

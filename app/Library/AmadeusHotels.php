@@ -72,21 +72,58 @@ class AmadeusHotels extends AmadeusConnection {
 
 
     /**
+     * Get format data returned from Amadeus
+     *
+     *
+     * @return Array
+     */
+    public function getHotels()  {
+
+
+      $hotels = $this->hotels;
+
+      $hotelList = array();
+
+      foreach($hotels as $hotel) {
+
+          $data = [
+            'name'        => $hotel->hotel->name,
+            'description' => $hotel->hotel->description->text ?? '',
+            'rating'      => $hotel->hotel->rating,
+            'distance'    => $hotel->hotel->hotelDistance->distance . ' ' . $hotel->hotel->hotelDistance->distanceUnit,
+            'available'   => $hotel->available,
+            'price'       => ( isset($hotel->offers[0]->price->total) ? $hotel->offers[0]->price->total : '--' ),
+            'url'         => $hotel->self,
+          ];
+
+          array_push($hotelList, $data);
+      }
+
+      return json_decode(json_encode($hotelList), FALSE);
+
+
+    }
+
+
+
+    /**
      * Get Average price of Hotels
      *
      * @return Integer price
      */
     public function getAveragePrice(int $quantity = 10)  {
 
-        $avg = 0;
+        $sum = 0;
         foreach ($this->hotels as $k => $hotel) {
             $total = ($hotel->offers[0]->price->total) ?? 0;
-            $avg += $total;
+            $sum += $total;
 
             if($k == $quantity) break;
         }
 
-        return $avg / ( ( count($this->hotels) < $quantity) ? count($this->hotels) : $quantity );
+        $avg = $sum / ( ( count($this->hotels) < $quantity) ? count($this->hotels) : $quantity );
+
+        return round($avg);
 
     }
 

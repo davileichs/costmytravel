@@ -25,6 +25,10 @@ class SearchController
 
 
 
+    /**
+     * Validation entries request
+     *
+     */
     protected function validation(Request $request) {
 
         $this->from = $request->from;
@@ -38,6 +42,12 @@ class SearchController
     }
 
 
+    /**
+     * Return simple search request
+     *
+     * @param Request $request
+     *
+     */
     public function simpleSearch(Request $request) {
 
         $request->validate([
@@ -50,32 +60,26 @@ class SearchController
 
         $this->validation($request);
 
-        $flight = $this->getKiwiData();
-        #$avgHotel = $this->getAmadeusData();
-        #$costCity = $this->getNumbeoData();
+        $flight = $this->getFlightData();
+        $hotel = $this->getHotelData();
+        $costCity = $this->getCostData();
 
-      #  $priceMeal = $costCity['priceMeal'];
-      #  $priceTicket = $costCity['priceTicket'];
-
-      #  $total = $avgFlight + $avgHotel + $priceMeal + $priceTicket;
         $days = $request->days;
         $persons = $request->persons;
 
         $view = view("components.simple-search-result", [
-            'persons'   => $persons,
-            'days'      => $days,
-            'avgFlight' => $flight['avgFlight']
+            'persons'     => $persons,
+            'days'        => $days,
+            'avgFlight'   => $flight['avgFlight'],
+            'avgHotel'    => $hotel['avgHotel'],
+            'avgMeal'     => $costCity['priceMeal'],
+            'avgTickets'  => $costCity['priceTicket'],
           ])
         ->render();
         return response()->json([
           'view'          => $view,
           'flight'        => $flight,
-      #    'avgHotel'      => $avgHotel,
-      #    'priceMeal'     => $priceMeal,
-      #    'priceTicket'   => $priceTicket,
-      #    'days'          => $days,
-      #    'persons'       => $persons,
-      #    'total'         => $total,
+          'hotel'         => $hotel,
           'persons'       => $persons,
         ], 200);
 
@@ -84,14 +88,19 @@ class SearchController
 
 
 
-    protected function getKiwiData() {
+    /**
+     * Get Data of flights from Kiwi
+     *
+     */
+    protected function getFlightData() {
 
         $search = [
           'fly_from'    => Handling::getCityCode($this->from),
           'fly_to'      => Handling::getCityCode($this->to),
           'date_from'   => $this->startDate,
           'date_to'     => $this->endDate,
-          'adults'      => $this->persons
+          'adults'      => $this->persons,
+          'flight_type'  => 'return'
         ];
 
         $kiwiSearch = new Kiwi();
@@ -105,7 +114,11 @@ class SearchController
     }
 
 
-    protected function getAmadeusData() {
+    /**
+     * Get data of hotels from Amadeus
+     *
+     */
+    protected function getHotelData() {
 
         $search = [
           'cityCode'        => Handling::getCityCode($this->to),
@@ -118,14 +131,20 @@ class SearchController
         $amadeusSearch = new Hotels();
 
         $amadeusSearch->searchHotels( $search );
-
+        $hotels = $amadeusSearch->getHotels();
         $avgHotelPrice = $amadeusSearch->getAveragePrice() * $this->days;
 
-        return $avgHotelPrice;
+        $view = view("components.hotel-list", compact('hotels'))->render();
+        return [ 'avgHotel' => $avgHotelPrice, 'view' => $view ];
+
 
     }
 
-    protected function getNumbeoData() {
+    /**
+     * Get data of costs of meals and tickets from Numeo
+     *
+     */
+    protected function getCostData() {
 
         $numbeo = new Numbeo( Handling::getCityName($this->to) );
 
@@ -144,6 +163,10 @@ class SearchController
 
 
 
+    /**
+     * Get City data from Amadeus
+     *
+     */
     public function searchLocation(Request $request) {
 
         $amadeusSearch = new Location();

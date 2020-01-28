@@ -63,7 +63,6 @@ class KiwiConnection {
     /**
      * Get format data returned from Kiwi
      *
-     * @param Array $search
      *
      * @return Array
      */
