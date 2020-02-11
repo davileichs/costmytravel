@@ -29,8 +29,8 @@ class e2Controller extends Controller
           $date = Carbon::now('Europe/Vienna')->startOfDay();
 
           //add one hour since Carbon can't handle well timezone different from GMT0, just workaround for this project
-          $datafrom = $date->addHour()->toIso8601ZuluString();
-          $datato = $date->copy()->addDays(2)->endOfDay()->addHour()->toIso8601ZuluString();
+          $datafrom = $date->addDays(1)->addHour()->toIso8601ZuluString();
+          $datato = $date->copy()->addDays(3)->endOfDay()->addHour()->toIso8601ZuluString();
 
           $link = '/v3/de_DE/15/matches?attach=matches.competition&matchdate_from='.$datafrom.'&matchdate_to='.$datato.'&states=PRE';
 
