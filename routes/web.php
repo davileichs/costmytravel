@@ -16,3 +16,5 @@ Route::get('/', function(){
 })->name('cv');
 
 Route::get('/costmytravel', 'HomeController@index')->name('index');
+
+Route::get('/e2', 'e2Controller@index')->name('index');
