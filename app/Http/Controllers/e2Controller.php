@@ -6,12 +6,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 
-
-
 class e2Controller extends Controller
 {
-
-
     private $matches = array();
     private $attachments = array();
 
@@ -24,25 +20,23 @@ class e2Controller extends Controller
     *
     *
     */
-    public function index() {
+    public function index()
+    {
+        $date = Carbon::now('Europe/Vienna')->startOfDay();
 
-          $date = Carbon::now('Europe/Vienna')->startOfDay();
+        //add one hour since Carbon can't handle well timezone different from GMT0, just workaround for this project
+        $datafrom = $date->addDays(1)->addHour()->toIso8601ZuluString();
+        $datato = $date->copy()->addDays(2)->endOfDay()->addHour()->toIso8601ZuluString();
 
-          //add one hour since Carbon can't handle well timezone different from GMT0, just workaround for this project
-          $datafrom = $date->addDays(1)->addHour()->toIso8601ZuluString();
-          $datato = $date->copy()->addDays(2)->endOfDay()->addHour()->toIso8601ZuluString();
+        $link = '/v3/de_DE/15/matches?attach=matches.competition&matchdate_from='.$datafrom.'&matchdate_to='.$datato.'&states=PRE';
 
-          $link = '/v3/de_DE/15/matches?attach=matches.competition&matchdate_from='.$datafrom.'&matchdate_to='.$datato.'&states=PRE';
+        $this->getAllData($link);
 
-          $this->getAllData($link);
+        $this->orderImportantMatches();
 
-          $this->orderImportantMatches();
+        $matchesDates = $this->separateDateMatches();
 
-          $matchesDates = $this->separateDateMatches();
-
-            return view('e2')->with(compact('matchesDates'));
-
-
+        return view('e2')->with(compact('matchesDates'));
     }
 
 
@@ -54,19 +48,16 @@ class e2Controller extends Controller
     *
     * @return json
     */
-    private function getData(String $link) {
+    private function getData(String $link)
+    {
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', $this->baseUrl . $link);
 
-      $client = new \GuzzleHttp\Client();
-      $response = $client->request('GET', $this->baseUrl . $link);
+        if ($response->getStatusCode() == 200) {
+            $data = json_decode($response->getBody());
+        }
 
-      if ($response->getStatusCode() == 200) {
-
-        $data = json_decode($response->getBody() );
-
-      }
-
-      return $data;
-
+        return $data;
     }
 
 
@@ -76,13 +67,11 @@ class e2Controller extends Controller
     * @param Object $data
     *
     */
-    private function compileMatches($data) {
-
-          foreach ($data->data as $key => $value) {
-              array_push($this->matches, $this->getMatchValues($data, $value) );
-          }
-
-
+    private function compileMatches($data)
+    {
+        foreach ($data->data as $key => $value) {
+            array_push($this->matches, $this->getMatchValues($data, $value));
+        }
     }
 
 
@@ -94,8 +83,8 @@ class e2Controller extends Controller
     *
     * @return array
     */
-    private function getMatchValues($data, $value) {
-
+    private function getMatchValues($data, $value)
+    {
         $attachments = $data->attachments->$value;
 
         $competition = $attachments->competition;
@@ -125,20 +114,16 @@ class e2Controller extends Controller
     * @param String $link
     *
     */
-    private function getAllData($link) {
+    private function getAllData($link)
+    {
+        $data = $this->getData($link);
 
-          $data = $this->getData($link);
-
-          $this->compileMatches($data);
-
-
-          if ( !empty($data->pagination->next) ) {
-
-              $this->getAllData($data->pagination->next);
-
-          }
+        $this->compileMatches($data);
 
 
+        if (!empty($data->pagination->next)) {
+            $this->getAllData($data->pagination->next);
+        }
     }
 
 
@@ -148,29 +133,28 @@ class e2Controller extends Controller
     *
     * @return array
     */
-    private function separateDateMatches() {
+    private function separateDateMatches()
+    {
+        $matches = $this->matches;
 
-          $matches = $this->matches;
+        foreach ($matches as $match) {
+            $date = $match['date_pos'];
 
-          foreach($matches as $match) {
+            if (!isset($list[$date])) {
+                $list[$date] = new \stdClass();
+            }
 
-                $date = $match['date_pos'];
+            $list[$date]->date = $match['date'];
+            $list[$date]->data[] = $match;
+        }
 
-                if ( !isset($list[$date]) ) { $list[$date] = new \stdClass(); }
+        foreach ($list as $k=>$value) {
+            $list[$k]->data = array_slice($list[$k]->data, 0, 15);
+        }
 
-                $list[$date]->date = $match['date'];
-                $list[$date]->data[] = $match;
+        sort($list);
 
-          }
-
-          foreach($list as $k=>$value) {
-              $list[$k]->data = array_slice($list[$k]->data, 0, 15);
-          }
-
-          sort($list);
-
-          return $list;
-
+        return $list;
     }
 
 
@@ -179,12 +163,10 @@ class e2Controller extends Controller
     *
     *
     */
-    private function orderImportantMatches() {
-
-        usort($this->matches, function($a, $b) {
+    private function orderImportantMatches()
+    {
+        usort($this->matches, function ($a, $b) {
             return $b['importance'] <=> $a['importance'] ?: $b['hour'] <=> $a['hour'];
         });
-
     }
-
 }

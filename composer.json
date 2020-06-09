@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.2",
         "fideloper/proxy": "^4.0",
+        "friendsofphp/php-cs-fixer": "^2.16",
         "guzzlehttp/guzzle": "~6.0",
         "ixudra/curl": "^6.18",
         "laravel/framework": "^6.2",
